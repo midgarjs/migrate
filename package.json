@@ -18,7 +18,7 @@
     "type": "git"
   },
   "dependencies": {
-    "@midgar/midgar": "^1.0.0-alpha.2.1",
+    "@midgar/midgar": "^1.0.0-alpha.2.2",
     "@midgar/service": "^1.0.0-alpha.1.1",
     "@midgar/utils": "^1.0.0-alpha.1.5"
   },

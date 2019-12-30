@@ -133,10 +133,10 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@midgar/midgar@^1.0.0-alpha.2.1":
-  version "1.0.0-alpha.2.1"
-  resolved "https://registry.yarnpkg.com/@midgar/midgar/-/midgar-1.0.0-alpha.2.1.tgz#1e42b758564b788ba22903c4a59ba5f2e24db3d6"
-  integrity sha512-RLCpCp4UTabyRGbps9+7EcrgQvvmts+Bmnvc7LOCZApDPlPK4RrKSVESFL+Ig9noM/pAszU2+NO16wMGVqxIpg==
+"@midgar/midgar@^1.0.0-alpha.2.1", "@midgar/midgar@^1.0.0-alpha.2.2":
+  version "1.0.0-alpha.2.2"
+  resolved "https://registry.yarnpkg.com/@midgar/midgar/-/midgar-1.0.0-alpha.2.2.tgz#2ecef6551e9b7f4f48ed7c6587ea7c85963db013"
+  integrity sha512-W1QHu4kh9PBkMLFMRXUB/oWTx/qZRS6MTT1HiUl/eRM6FqLIT1AeqxTRaxc7FZT6bjQQbg+H4xaUigEEur0YCg==
   dependencies:
     "@midgar/utils" "^1.0.0-alpha.1.5"
     body-parser "^1.19.0"
