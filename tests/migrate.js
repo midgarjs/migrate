@@ -83,6 +83,7 @@ const shouldResult = (type) => [
 describe('Migrate', function () {
 
   before(() => {
+    this.timeout(10000)
     // Create tmp dir
     tmpDir = getTmpDir()
   })
