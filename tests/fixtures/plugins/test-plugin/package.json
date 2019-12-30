@@ -1,0 +1,18 @@
+{
+  "name": "test-plugin",
+  "version": "0.0.1",
+  "description": "Unit test midgar plugin",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+  },
+  "dependencies": {
+    "@midgar/midgar": "1.0.0-alpha.2.1",
+    "@midgar/migrate": "1.0.0-alpha.1.0",
+    "test-plugin-2": "file:../test-plugin-2"
+  },
+  "devDependencies": {},
+  "author": "Metais Fabien",
+  "license": "MIT"
+}

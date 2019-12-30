@@ -1,0 +1,48 @@
+{
+  "name": "@midgar/migrate",
+  "version": "1.0.0-alpha.1.0",
+  "description": "A migration tool for Migar",
+  "main": "src/index.js",
+  "module": "true",
+  "scripts": {
+    "postinstall": "midgar add @midgar/migration",
+    "preuninstall": "midgar rm @midgar/migration",
+    "build-docs": "jsdoc -c ./jsdoc.js -t ./node_modules/ink-docstrap/template ./README.md -r .",
+    "test": "mocha -r esm tests/*.js --exit",
+    "coverage": "nyc -i esm --reporter=text mocha -r esm tests/*.js --exit",
+    "test:tc": "mocha --require esm tests/*.js --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters.json --exit",
+    "coverage:tc": "nyc --require esm --reporter=teamcity --reporter=lcov npm run test:tc",
+    "eslint": "eslint -f json -o reports/.eslint-report.json src/ || exit 0"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "dependencies": {
+    "@midgar/midgar": "^1.0.0-alpha.2.1",
+    "@midgar/service": "^1.0.0-alpha.1.1",
+    "@midgar/utils": "^1.0.0-alpha.1.5"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "chai": "^4.2.0",
+    "chai-arrays": "^2.0.0",
+    "dirty-chai": "^2.0.1",
+    "ink-docstrap": "^1.3.2",
+    "jsdoc": "^3.6.3",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-sonarjs": "^0.5.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^6.2.2",
+    "mocha-multi-reporters": "^1.1.7",
+    "mocha-sonarqube-reporter": "^1.0.1",
+    "mocha-teamcity-reporter": "^3.0.0",
+    "esm": "^3.2.25",
+    "nyc": "^15.0.0"
+  },
+  "author": "Metais Fabien",
+  "license": "MIT"
+}
