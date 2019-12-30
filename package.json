@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "module": "true",
   "scripts": {
-    "postinstall": "midgar add @midgar/migration",
-    "preuninstall": "midgar rm @midgar/migration",
+    "postinstall": "midgar add @midgar/migrate",
+    "preuninstall": "midgar rm @midgar/migrate",
     "build-docs": "jsdoc -c ./jsdoc.js -t ./node_modules/ink-docstrap/template ./README.md -r .",
     "test": "mocha -r esm tests/*.js --exit",
     "coverage": "nyc -i esm --reporter=text mocha -r esm tests/*.js --exit",
