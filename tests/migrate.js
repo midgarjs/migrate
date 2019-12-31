@@ -60,22 +60,17 @@ let tmpDir = null
  * @private
  */
 async function runCliCmd (cmd, args = []) {
-  console.log('instance cli')
   const cli = new Cli(['', '', cmd, '--config', configPath, ...args])
   // await wait(2500)
   //
   cli.mid.on('@midgar/migrate:init', async (migrateService) => {
-    console.log('@midgar/migrate:init')
     migrateService.addStorage(STORAGE_KEY, testMigrateStorage)
     const storage = await migrateService.getStorage(STORAGE_KEY)
     storage.tmpDir = tmpDir
   })
 
-  console.log('cli init')
   await cli.init()
-  console.log('cli run')
   const result = await cli.run()
-  console.log('/cli run')
 
   return {
     cli,
@@ -109,16 +104,9 @@ describe('Migrate', function () {
 
   // Test db:up command
   it('up all', async () => {
-    timer.start('test-up-all')
-    console.log('up all 1')
     const { cli } = await runCliCmd('migrate:up', ['--storage', STORAGE_KEY])
-    let time = timer.getTime('test-up-all')
-    console.log('up all 2', time + ' ms')
     const storage = cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
-    time = timer.getTime('test-up-all')
-    console.log('up all 3', time + ' ms')
     expect(storage.result).to.eql(shouldResult('up'))
-    console.log('up all 4')
   })
 
   it('down all', async () => {
