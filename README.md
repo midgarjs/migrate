@@ -58,5 +58,5 @@ $ midgar migrate:up --config ~/mon-project/src/config
 
 --storage clef du storage:
 ```sh
-$ midgar migrate:up --storage moongoose
+$ midgar migrate:up --storage mongo
 ```

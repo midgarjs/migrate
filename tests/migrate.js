@@ -7,7 +7,6 @@ import _rimraf from 'rimraf'
 import fs from 'fs'
 import os from 'os'
 import uid from 'uid-safe'
-import { timer } from '@midgar/utils'
 
 /**
  * @type {Midgar}
@@ -33,14 +32,6 @@ const configPath = path.resolve(__dirname, 'fixtures/config')
 function rimraf (rmPath) {
   return new Promise((resolve, reject) => {
     _rimraf(rmPath, resolve)
-  })
-}
-
-const wait = (x) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve()
-    }, x)
   })
 }
 

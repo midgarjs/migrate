@@ -1,6 +1,6 @@
 
 import semver from 'semver'
-import { assignRecursive, asyncMap } from '@midgar/utils'
+import { assignRecursive } from '@midgar/utils'
 
 /**
  * Service name
@@ -466,7 +466,8 @@ class MigrateService {
         // Roll back
         try {
           return this._execMigration(storage, method === 'up' ? 'down' : 'up', version)
-        } catch (error) {
+        } catch (rollBackError) {
+          this.mid.error(rollBackError)
           throw new Error('@midgar/migrate: Execution fail !')
         }
       }
