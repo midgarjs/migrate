@@ -55,7 +55,6 @@ async function runCliCmd (cmd, args = []) {
 
   //
   cli.mid.on('@midgar/migrate:init', async (migrateService) => {
-
     migrateService.addStorage(STORAGE_KEY, testMigrateStorage)
     const storage = await migrateService.getStorage(STORAGE_KEY)
     storage.tmpDir = tmpDir
@@ -81,7 +80,6 @@ const shouldResult = (type) => [
  * Migrate test
  */
 describe('Migrate', function () {
-
   before(() => {
     this.timeout(10000)
     // Create tmp dir

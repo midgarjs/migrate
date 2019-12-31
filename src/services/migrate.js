@@ -1,6 +1,6 @@
 
 import semver from 'semver'
-import { assignRecursive, asyncMap, asyncReaddir } from '@midgar/utils'
+import { assignRecursive, asyncMap } from '@midgar/utils'
 
 /**
  * Service name
@@ -121,45 +121,6 @@ class MigrateService {
         }
       }
     })
-  }
-
-  /**
-   * Check if a filename match with the verions filename reg exp
-   *
-   * @param {string} filename File name
-   * @return {boolean}
-   */
-  isVesionFile (filename) {
-    const match = filename.match(this._fileNameRegExp)
-    return match && match[1]
-  }
-
-  /**
-   * Return an array with version filename in the dir
-   *
-   * @param {String} dirPath Directory path
-   * @returns {Array}
-   * @private
-   */
-  async _getMigrationFiles (dirPath) {
-    try {
-      const versionFiles = []
-      // Get files in dir dirPath
-      const files = await asyncReaddir(dirPath)
-
-      // List files
-      for (let i = 0; i < files.length; i++) {
-        // If the file name match with version file regex add it
-        if (this.isVesionFile(files[i])) {
-          versionFiles.push(files[i])
-        }
-      }
-
-      return versionFiles
-    } catch (error) {
-      this.mid.error('Cannot read dir  ' + dirPath)
-      throw new Error(error)
-    }
   }
 
   /**
@@ -350,14 +311,14 @@ class MigrateService {
     const storage = this.getStorage(storageKey)
     this.mid.debug(`@midgar/migrate: down ${num || 'all'} ${storageKey || this.config.storage}`)
     // Get files and executed migrations async
-    let [schemaFiles, dataFiles, executedMigrations] = await Promise.all([this._getSchematFiles(), this._getDataFiles(), this._getExecutedMigrations(storage)])
+    const [schemaFiles, dataFiles, executedMigrations] = await Promise.all([this._getSchematFiles(), this._getDataFiles(), this._getExecutedMigrations(storage)])
 
     if (!executedMigrations.length) {
       this.mid.warn('@midgar/migrate: No executed migration in storage.')
       return []
     }
 
-    executedMigrations = executedMigrations.reverse()
+    executedMigrations.reverse()
     if (num && typeof num === 'string') num = parseInt(num)
     // If no number version is specified exec all executed
     if (num === null) num = executedMigrations.length
@@ -420,7 +381,7 @@ class MigrateService {
    *                                  }
    * @private
    */
-  async _checkMigrationFile (file) {
+  _checkMigrationFile (file) {
     if (!file.export.up) {
       throw new Error('@midgar/migrate: Not up function in the version file : ' + file.path + ' !')
     }
@@ -432,7 +393,7 @@ class MigrateService {
     }
 
     // Check num items in the array
-    if (Array.isArray(file.expor.up) && file.expor.down && file.expor.up.length !== file.expor.down.length) {
+    if (Array.isArray(file.export.up) && file.export.down && file.export.up.length !== file.export.down.length) {
       throw new Error('@midgar/migrate: not same length for the up and down array in the version file : ' + file.path)
     }
   }
@@ -458,6 +419,7 @@ class MigrateService {
    * @private
    */
   async _execMigration (storage, method, file, type) {
+    this._checkMigrationFile(file)
     this.mid.debug('@midgar/migrate: Execute ' + method + ' on ' + file.path)
     const execTime = await this._execMigrationFunc(storage, method, file.export, !this.config.rollBack === false)
     // Save in storage
