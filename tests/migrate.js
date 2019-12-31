@@ -84,7 +84,6 @@ const shouldResult = (type) => [
  */
 describe('Migrate', function () {
   before(() => {
-    this.timeout(100000)
     // Create tmp dir
     tmpDir = getTmpDir()
   })
@@ -96,6 +95,7 @@ describe('Migrate', function () {
 
   // Test db:up command
   it('up all', async () => {
+    this.timeout(10000)
     timer.start('test-up-all')
     console.log('up all 1')
     const { cli } = await runCliCmd('migrate:up', ['--storage', STORAGE_KEY])
