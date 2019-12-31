@@ -73,7 +73,9 @@ const shouldResult = (type) => [
   type + '-0.1.0-test2.js',
   type + '-0.1.0-test.js',
   type + '-0.1.0-create-test-data.js',
-  type + '-0.1.0-test3.js'
+  type + '-0.1.0-test3.js',
+  type + '-0.1.1-test3.js',
+  type + '-1.1.1-test3.js'
 ]
 
 /**

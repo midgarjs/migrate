@@ -103,27 +103,6 @@ class MigrateService {
   }
 
   /**
-   * Return the dirs sorted by depenciesOrder
-   *
-   * @param {Array} dirs              Migration directories
-   * @param {Array} dependenciesOrder Plugin names sorted by dependency order
-   * @return {Array}
-   * @private
-   */
-  _getDirsSorted (dirs, dependenciesOrder) {
-    // List plugins
-    return asyncMap(dependenciesOrder, async (plugin) => {
-      // List all plugin dirs
-      for (let i = 0; i < dirs.length; i++) {
-        const dir = dirs[i]
-        if (dir.plugin === plugin) {
-          return { plugin: dir.plugin, path: dir.path }
-        }
-      }
-    })
-  }
-
-  /**
    * Return true if the version file is already executed or false
    *
    * @param {String} versionName      Migration filename
@@ -229,10 +208,9 @@ class MigrateService {
             pending[type].push(file)
           }
         }
-
         // Sort
         pending[type].sort((a, b) => {
-          return this._compareVersion(a, b)
+          return this._compareVersion(a.relativePath, b.relativePath)
         })
       }
 
