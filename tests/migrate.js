@@ -95,9 +95,13 @@ describe('Migrate', function () {
 
   // Test db:up command
   it('up all', async () => {
+    console.log('up all 1')
     const { cli } = await runCliCmd('migrate:up', ['--storage', STORAGE_KEY])
+    console.log('up all 2')
     const storage = cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
+    console.log('up all 3')
     expect(storage.result).to.eql(shouldResult('up'))
+    console.log('up all 4')
   })
 
   it('down all', async () => {
