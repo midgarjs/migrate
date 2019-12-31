@@ -26,8 +26,8 @@ export default {
   },
   log: {
     dir: getTmpDir('logs'),
-    stdout: false,
-    level: 'error'
+    stdout: true,
+    level: 'debug'
   },
   plugin: {
     dir: resolve('../plugins')

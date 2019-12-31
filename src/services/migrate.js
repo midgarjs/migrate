@@ -251,15 +251,17 @@ class MigrateService {
    * @return {Array}
    */
   async up (num = null, storageKey = null) {
+    console.log('service up', num, storageKey)
     const storage = this.getStorage(storageKey)
     this.mid.debug(`@midgar/migrate: up ${num || 'all'} ${storageKey || this.config.storage}`)
 
     const pendingMigrations = await this.getPendingMigrations(storageKey)
-
+    console.log('service up 2')
     if (!pendingMigrations.length) {
       this.mid.war('@midgar/migrate: No pending migration in storage.')
       return []
     }
+    console.log('service up 3')
 
     const result = []
     // Parse num to Int
@@ -276,6 +278,8 @@ class MigrateService {
       const execTime = await this._execMigration(storage, 'up', version, type)
       result.push({ plugin, type, name: version.relativePath, path: version.path, time: execTime })
     }
+
+    console.log('service up 4')
 
     return result
   }
