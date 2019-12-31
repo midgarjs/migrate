@@ -52,17 +52,22 @@ let tmpDir = null
  * @private
  */
 async function runCliCmd (cmd, args = []) {
+  console.log('instance cli')
   const cli = new Cli(['', '', cmd, '--config', configPath, ...args])
 
   //
   cli.mid.on('@midgar/migrate:init', async (migrateService) => {
+    console.log('@midgar/migrate:init')
     migrateService.addStorage(STORAGE_KEY, testMigrateStorage)
     const storage = await migrateService.getStorage(STORAGE_KEY)
     storage.tmpDir = tmpDir
   })
 
+  console.log('cli init')
   await cli.init()
+  console.log('cli run')
   const result = await cli.run()
+  console.log('/cli run')
 
   return {
     cli,

@@ -8,7 +8,7 @@
   "repository": {
   },
   "dependencies": {
-    "@midgar/midgar": "1.0.0-alpha.2.1",
+    "@midgar/midgar": "1.0.0-alpha.2.2",
     "@midgar/migrate": "1.0.0-alpha.1.0"
   },
   "devDependencies": {},
