@@ -36,6 +36,14 @@ function rimraf (rmPath) {
   })
 }
 
+const wait = (x) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve()
+    }, x)
+  })
+}
+
 /**
  * Create random dir in tmp os directory and return it
  * @private
@@ -54,7 +62,7 @@ let tmpDir = null
 async function runCliCmd (cmd, args = []) {
   console.log('instance cli')
   const cli = new Cli(['', '', cmd, '--config', configPath, ...args])
-
+  // await wait(2500)
   //
   cli.mid.on('@midgar/migrate:init', async (migrateService) => {
     console.log('@midgar/migrate:init')
@@ -88,6 +96,7 @@ const shouldResult = (type) => [
  * Migrate test
  */
 describe('Migrate', function () {
+  this.timeout(10000)
   before(() => {
     // Create tmp dir
     tmpDir = getTmpDir()
@@ -100,7 +109,6 @@ describe('Migrate', function () {
 
   // Test db:up command
   it('up all', async () => {
-    this.timeout(10000)
     timer.start('test-up-all')
     console.log('up all 1')
     const { cli } = await runCliCmd('migrate:up', ['--storage', STORAGE_KEY])
