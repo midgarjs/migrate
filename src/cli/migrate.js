@@ -11,8 +11,10 @@ const STORAGE_OPTION_DESCRIPTION = 'Migrate storage to use'
  * @private
  */
 async function up (mid, num = null, cmd) {
+  console.log('up action', num)
   const migrateService = mid.getService(MIGRATE_SERVICE_NAME)
   const migrations = await migrateService.up(num, cmd.storage)
+  console.log('/up action', migrations)
   const result = {
     stdout: []
   }
