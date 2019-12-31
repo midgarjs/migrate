@@ -7,6 +7,7 @@ import _rimraf from 'rimraf'
 import fs from 'fs'
 import os from 'os'
 import uid from 'uid-safe'
+import { timer } from '@midgar/utils'
 
 /**
  * @type {Midgar}
@@ -83,7 +84,7 @@ const shouldResult = (type) => [
  */
 describe('Migrate', function () {
   before(() => {
-    this.timeout(10000)
+    this.timeout(100000)
     // Create tmp dir
     tmpDir = getTmpDir()
   })
@@ -95,11 +96,14 @@ describe('Migrate', function () {
 
   // Test db:up command
   it('up all', async () => {
+    timer.start('test-up-all')
     console.log('up all 1')
     const { cli } = await runCliCmd('migrate:up', ['--storage', STORAGE_KEY])
-    console.log('up all 2')
+    let time = timer.getTime('test-up-all')
+    console.log('up all 2', time + ' ms')
     const storage = cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
-    console.log('up all 3')
+    time = timer.getTime('test-up-all')
+    console.log('up all 3', time + ' ms')
     expect(storage.result).to.eql(shouldResult('up'))
     console.log('up all 4')
   })
