@@ -6,8 +6,8 @@ steps:
   image: node:latest
   commands:
     - yarn
-    - yarn run coverage
-    - yarn run eslint
+    - yarn run coverage:ci
+    - yarn run eslint:ci
 - name: sonar
   image: aosapps/drone-sonar-plugin:latest
   settings:
@@ -16,6 +16,8 @@ steps:
     sonar_token:
       from_secret: sonar_token
     ver: 1.0
+    sources: src/
+    exclusions: docs/**/*
 - name: clean
   image: node:latest
   commands:

@@ -1,5 +1,5 @@
 const MIGRATE_SERVICE_NAME = 'mid:migrate'
-const STORAGE_OPTION_FLAGS = '-d, --storage <path>'
+const STORAGE_OPTION_FLAGS = '-s, --storage <path>'
 const STORAGE_OPTION_DESCRIPTION = 'Migrate storage to use'
 
 /**
