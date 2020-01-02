@@ -21,6 +21,23 @@ Si tout s'est bien passé, un message de confirmation s'affiche:
 ## Fonctionnement
 Ajoute un dossier de plugin **midgar-migrate-schemas**: ./migrations/schemas et **midgar-migrate-data**: ./migrations/data'
 
+Ce plugin à besoin d'un storage pour fonctionner. Le storage sert a sauvegarder l'état des migrations.
+
+## Fichier migration
+
+Exemple de fichier de migration:
+```js
+export default {
+  up: async (mid, ...storageArgs) => {
+    // Up script
+  },
+  down: async (mid, ...storageArgs) => {
+    // Down script
+  }
+}
+
+```
+
 ## Commandes cli
 
 ### Up
@@ -61,4 +78,66 @@ $ midgar migrate:up --config ~/mon-project/src/config
 --storage clef du storage:
 ```sh
 $ midgar migrate:up --storage mongo
+```
+
+## Storages:
+[@midgar/mongo](https://github.com/midgarjs/migrate)
+
+### Exemple de storate
+
+```js
+class Storage {
+  constructor (mid) {
+    this.mid = mid
+  }
+
+  async isInstalled () {
+    return true
+  }
+
+  async getMigrations () {
+    return []
+  }
+
+  /**
+   * Save executed migration
+   *
+   * @param {string} plugin Plugin name
+   * @param {string} name   Migration file name
+   * @param {string} type   Migration type (schema|data)
+   */
+  async saveMigration (plugin, name, type) {
+  }
+
+  /**
+   * Delete executed migration
+   *
+   * @param {string} plugin Plugin name
+   * @param {string} name   Migration file name
+   * @param {string} type   Migration type (schema|data)
+   */
+  async deleteMigration (plugin, name, type) {
+  }
+
+  /**
+   * Retrun migation function args after midgar instance 
+   */
+  getCallArgs () {
+    return []
+  }
+}
+
+export default Storage
+```
+
+### Ajouter le storate
+
+Depuis la méthode init du plugin:
+
+```js
+import Storage from './libs/migrate-storage.js'
+...
+this.mid.on('@midgar/migrate:init', (migrateService) => {
+  migrateService.addStorage('monstorage', Storage)
+})
 ```
