@@ -1,8 +1,10 @@
-![](https://ci.midgar.io/app/rest/builds/buildType:(id:Midgar_Migrate_Build)/statusIcon) [![Coverage](https://sonar.midgar.io/api/project_badges/measure?project=Midgar_Migrate&metric=coverage)](https://sonar.midgar.io/dashboard?id=Midgar_Migrate)
+[![Build Status](https://drone.midgar.io/api/badges/Midgar/migrate/status.svg)](https://drone.midgar.io/Midgar/migrate)
+[![Coverage](https://sonar.midgar.io/api/project_badges/measure?project=Midgar%3Amigrate&metric=coverage)](https://sonar.midgar.io/dashboard?id=Midgar%3Amigrate)
+
 
 ## @midgar/migrate
 
-Système de migration pour [Midgar](https://www.npmjs.com/package/@midgar/midgar)
+Système de migration pour [Midgar](https://github.com/midgarjs/midgar)
 
 ## Installation
 

@@ -11,13 +11,13 @@ class MigratePlugin extends Plugin {
     super(...args)
 
     /**
-     * Db schema dir key
+     * Schema dir key
      * @type {String}
      */
     this.schemaDirKey = SCHEMA_DIR_KEY
 
     /**
-     * Db data dir key
+     * Data dir key
      * @type {String}
      */
     this.dataDirKey = DATA_DIR_KEY

@@ -1,8 +1,5 @@
 {
   "include": [
     "src/**/*.js"
-  ],
-  "exclude": [
-    "src/bin/midgar.js"
   ]
 }

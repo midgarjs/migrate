@@ -62,6 +62,7 @@ class MigrateService {
    * Let other plugin add storage
    */
   async init () {
+    this.mid.debug('@midgar/migrate: init.')
     /**
      * init event.
      * @event @midgar/migrate:init
@@ -256,7 +257,7 @@ class MigrateService {
 
     const pendingMigrations = await this.getPendingMigrations(storageKey)
     if (!pendingMigrations.length) {
-      this.mid.war('@midgar/migrate: No pending migration in storage.')
+      this.mid.warn('@midgar/migrate: No pending migration in storage.')
       return []
     }
 

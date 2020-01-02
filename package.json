@@ -7,15 +7,14 @@
   "scripts": {
     "postinstall": "midgar add @midgar/migrate",
     "preuninstall": "midgar rm @midgar/migrate",
-    "build-docs": "jsdoc -c ./jsdoc.js -t ./node_modules/ink-docstrap/template ./README.md -r .",
-    "test": "mocha -r esm tests/*.js --exit",
-    "coverage": "nyc -i esm --reporter=text mocha -r esm tests/*.js --exit",
-    "test:tc": "mocha --require esm tests/*.js --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters.json --exit",
-    "coverage:tc": "nyc --require esm --reporter=teamcity --reporter=lcov npm run test:tc",
-    "eslint": "eslint -f json -o reports/.eslint-report.json src/ || exit 0"
+    "build-docs": "jsdoc -c ./jsdoc.js ./README.md -t ./node_modules/ink-docstrap/template ./README.md -r ./src/",
+    "test": "mocha --require esm tests/*.js --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters.json --exit",
+    "eslint": "eslint -f json -o reports/.eslint-report.json src/ || exit 0",
+    "coverage": "nyc -i esm --reporter=lcov npm run test"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/midgarjs/migrate.git"
   },
   "dependencies": {
     "@midgar/midgar": "^1.0.0-alpha.2.2",
