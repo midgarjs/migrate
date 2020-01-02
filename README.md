@@ -80,11 +80,9 @@ $ midgar migrate:up --config ~/mon-project/src/config
 $ midgar migrate:up --storage mongo
 ```
 
-## Storages:
-[@midgar/mongo](https://github.com/midgarjs/migrate)
+## Storages
 
-### Exemple de storate
-
+Exemple de storage:
 ```js
 class Storage {
   constructor (mid) {
@@ -130,7 +128,7 @@ class Storage {
 export default Storage
 ```
 
-### Ajouter le storate
+## Ajouter le storate
 
 Depuis la méthode init du plugin:
 
