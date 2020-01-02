@@ -17,7 +17,7 @@
     "url": "git+https://github.com/midgarjs/migrate.git"
   },
   "dependencies": {
-    "@midgar/midgar": "^1.0.0-alpha.2.2",
+    "@midgar/midgar": "^1.0.0-alpha.2.3",
     "@midgar/service": "^1.0.0-alpha.1.1",
     "@midgar/utils": "^1.0.0-alpha.1.5"
   },
