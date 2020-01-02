@@ -10,7 +10,7 @@ const STORAGE_OPTION_DESCRIPTION = 'Migrate storage to use'
  * @param {Command} cmd Commander command object
  * @private
  */
-async function up (mid, num = null, cmd) {
+async function up (mid, num, cmd) {
   const migrateService = mid.getService(MIGRATE_SERVICE_NAME)
   const migrations = await migrateService.up(num, cmd.storage)
   const result = {
@@ -72,7 +72,7 @@ export default [
         description: STORAGE_OPTION_DESCRIPTION
       }
     ],
-    action: async (mid, num = null, cmd) => {
+    action: async (mid, num, cmd) => {
       const migrateService = mid.getService(MIGRATE_SERVICE_NAME)
       await migrateService.down(num, cmd.storage)
     }
