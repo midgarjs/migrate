@@ -10,7 +10,7 @@ export default {
     if (arg1 !== 'test_arg1') throw new Error('Invalid second arg in ' + name + ' !')
     if (arg2 !== 'test_arg2') throw new Error('Invalid third arg in ' + name + ' !')
 
-    const storage = await mid.getService('mid:migrate').getStorage('test-storage')
+    const storage = mid.getService('mid:migrate').getStorage('test-storage')
     storage.result.push(name)
   },
   down: async (mid, arg1, arg2) => {
@@ -19,7 +19,7 @@ export default {
     if (arg1 !== 'test_arg1') throw new Error('Invalid second arg in ' + name + ' !')
     if (arg2 !== 'test_arg2') throw new Error('Invalid third arg in ' + name + ' !')
 
-    const storage = await mid.getService('mid:migrate').getStorage('test-storage')
+    const storage = mid.getService('mid:migrate').getStorage('test-storage')
     storage.result.push(name)
   }
 }

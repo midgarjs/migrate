@@ -96,13 +96,13 @@ describe('Migrate', function () {
   // Test db:up command
   it('up all', async () => {
     const { cli } = await runCliCmd('migrate:up', ['--storage', STORAGE_KEY])
-    const storage = cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
+    const storage = await cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
     expect(storage.result).to.eql(shouldResult('up'))
   })
 
   it('down all', async () => {
     const { cli } = await runCliCmd('migrate:down', ['--storage', STORAGE_KEY])
-    const storage = cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
+    const storage = await cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
     expect(storage.result).to.eql(shouldResult('down').reverse())
   })
 
@@ -112,7 +112,7 @@ describe('Migrate', function () {
     // Up 1 by 1
     for (let i = 0; i < upResult.length; i++) {
       const { cli } = await runCliCmd('migrate:up', [(1).toString(), '--storage', STORAGE_KEY])
-      const storage = cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
+      const storage = await cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
       expect(storage.result).to.eql([upResult[i]])
     }
   })
@@ -127,7 +127,7 @@ describe('Migrate', function () {
     const downResult = shouldResult('down').reverse()
     for (let i = 0; i < downResult.length; i++) {
       const { cli } = await runCliCmd('migrate:down', [(1).toString(), '--storage', STORAGE_KEY])
-      const storage = cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
+      const storage = await cli.mid.getService('mid:migrate').getStorage(STORAGE_KEY)
       // Remove down result
       expect(storage.result).to.eql([downResult[i]])
     }

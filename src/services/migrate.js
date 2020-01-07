@@ -253,7 +253,7 @@ class MigrateService {
    */
   async up (num = null, storageKey = null) {
     const storage = this.getStorage(storageKey)
-    this.mid.debug(`@midgar/migrate: up ${num || 'all'} ${storageKey || this.config.storage}`)
+    this.mid.info(`@midgar/migrate: up ${num || 'all'} ${storageKey || this.config.storage}`)
 
     const pendingMigrations = await this.getPendingMigrations(storageKey)
     if (!pendingMigrations.length) {
@@ -287,7 +287,7 @@ class MigrateService {
    */
   async down (num = null, storageKey = null) {
     const storage = this.getStorage(storageKey)
-    this.mid.debug(`@midgar/migrate: down ${num || 'all'} ${storageKey || this.config.storage}`)
+    this.mid.info(`@midgar/migrate: down ${num || 'all'} ${storageKey || this.config.storage}`)
     // Get files and executed migrations async
     const [schemaFiles, dataFiles, executedMigrations] = await Promise.all([this._getSchematFiles(), this._getDataFiles(), this._getExecutedMigrations(storage)])
 
@@ -409,7 +409,7 @@ class MigrateService {
         await storage.saveMigration(file.plugin, file.relativePath, type)
       }
     } catch (error) {
-      this.mid.error('@midgar/migratesave version error')
+      this.mid.error('@midgar/migrate: save version error !')
       this.mid.error(error)
     }
 
@@ -456,8 +456,8 @@ class MigrateService {
 
         return result
       } catch (error) {
-        this.mid.debug('@midgar/migrate: Something bad has happened !')
-        this.mid.debug(error)
+        this.mid.error('@midgar/migrate: Something bad has happened !')
+        this.mid.error(error)
 
         if (!rollback) {
           throw new Error('@midgar/migrate: Execution fail !')

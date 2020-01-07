@@ -17,19 +17,12 @@ function getTmpDir (name) {
 }
 
 export default {
-  web: {
-    port: 4000,
-    host: 'localhost',
-    ssl: false,
-    sslCert: '',
-    sslKey: ''
-  },
   log: {
     dir: getTmpDir('logs'),
     stdout: false,
     level: 'error'
   },
-  plugin: {
-    dir: resolve('../plugins')
+  pm: {
+    localPath: resolve('../plugins')
   }
 }
