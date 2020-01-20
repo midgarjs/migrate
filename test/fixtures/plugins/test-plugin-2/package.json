@@ -8,8 +8,8 @@
   "repository": {
   },
   "dependencies": {
-    "@midgar/midgar": "1.0.0-alpha.2.2",
-    "@midgar/migrate": "1.0.0-alpha.1.0"
+    "@midgar/midgar": "1.0.0-alpha.4.4",
+    "@midgar/migrate": "1.0.0-alpha.1.2"
   },
   "devDependencies": {},
   "author": "Metais Fabien",

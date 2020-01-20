@@ -1,15 +1,37 @@
 
 import semver from 'semver'
 import { assignRecursive } from '@midgar/utils'
+import { timer } from '@midgar/utils'
+
+/**
+ * @typedef {Object} Migration
+ * @property {string} plugin Plugin name
+ * @property {string} name   Migration file name
+ * @property {string} type   Migration type (schema|data)
+ */
+
+/**
+ * @typedef {Object} MigrationModule
+ * @property {function} up   Up function
+ * @property {function} down Down function
+ */
+
+/**
+ * @typedef {Object} ExecutedMigration
+ * @property {sring}  plugin Plugin name
+ * @property {sring}  type   Migration type (schema|data)
+ * @property {sring}  path   Migration file path
+ * @property {number} time   exec time in ms
+ */
 
 /**
  * Service name
- * @type {String}
+ * @type {string}
  */
 const serviceName = 'mid:migrate'
 
 /**
- * Midgar migrate service
+ * MidgarService class
  */
 class MigrateService {
   /**
@@ -26,7 +48,7 @@ class MigrateService {
 
     /**
      * Plugin config
-     * @var {Object}
+     * @var {object}
      */
     this.config = assignRecursive({}, this.mid.config.migrate || {}, {})
 
@@ -38,13 +60,13 @@ class MigrateService {
 
     /**
      * Storages
-     * @var {Object}
+     * @var {object}
      */
     this.storages = {}
 
     /**
      * Storage instances
-     * @var {Object}
+     * @var {object}
      * @private
      */
     this._storageInstances = {}
@@ -60,6 +82,8 @@ class MigrateService {
   /**
    * Init service
    * Let other plugin add storage
+   *
+   * @return {Promise<void>}
    */
   async init () {
     this.mid.debug('@midgar/migrate: init.')
@@ -73,7 +97,7 @@ class MigrateService {
   /**
    * Add storage
    *
-   * @param {String}           key     Storage key
+   * @param {string}           key     Storage key
    * @param {MigrateStorage} storage Storage instance
    */
   addStorage (key, storage) {
@@ -83,7 +107,7 @@ class MigrateService {
   /**
    * Return storage instance by key
    *
-   * @param {String} key Storage key
+   * @param {string} key Storage key
    *
    * @return {MigrateStroage}
    */
@@ -104,21 +128,21 @@ class MigrateService {
   }
 
   /**
-   * Return true if the version file is already executed or false
+   * Return true if the migration already executed or false
    *
-   * @param {String} versionName      Migration filename
-   * @param {String} plugin           Plugin name
-   * @param {String} type             Migration type (schema | data)
-   * @param {Array}  executedMigrations Executed version files
+   * @param {string}            name               Migration filename
+   * @param {string}            plugin             Plugin name
+   * @param {string}            type               Migration type (schema | data)
+   * @param {Array<Migration>}  executedMigrations Executed migrations
    *
-   * @return {Boolean}
+   * @return {boolean}
    * @return private
    */
-  _isExecuted (versionName, plugin, type, executedMigrations) {
-    // List executed version
+  _isExecuted (name, plugin, type, executedMigrations) {
+    // List executed migration
     for (const executedMigration of executedMigrations) {
-      // Check if the version is already executed
-      if (plugin === executedMigration.plugin && versionName === executedMigration.name &&
+      // Check if the migration is already executed
+      if (plugin === executedMigration.plugin && name === executedMigration.name &&
         type === executedMigration.type) {
         return true
       }
@@ -128,11 +152,11 @@ class MigrateService {
   }
 
   /**
-   * Return an array of executed version from database
+   * Return an array of executed migration from storage
    *
    * @param {MigrateStorage} storage Storage instance
    *
-   * @return {Array}
+   * @return {Promise<Array<Migration>>}
    * @private
    */
   async _getExecutedMigrations (storage) {
@@ -140,23 +164,20 @@ class MigrateService {
     const isInstalled = await storage.isInstalled()
     if (!isInstalled) return []
 
-    // Get version from storage
+    // Get execusted migration from storage
     return storage.getMigrations()
   }
 
   /**
-   * Conpare version number with semver to sort version file
+   * Conpare version number with semver to sort migration file
    *
-   * @param {String} a First version to compare
-   * @param {String} b Second version to compare
+   * @param {string} a First version to compare
+   * @param {string} b Second version to compare
    *
    * @return {Number}
    * @private
    */
   _compareVersion (a, b) {
-    a = a.match(this._fileNameRegExp)[1]
-    b = b.match(this._fileNameRegExp)[1]
-
     if (a === b) return 0
     if (semver.lt(a, b)) return -1
 
@@ -166,29 +187,46 @@ class MigrateService {
   /**
    * Return pending migrations
    *
-   * @param {String} storageKey Storage key
+   * @param {string}  storageKey Storage key
+   * @param {boolean} import_    Flag to import or not modules
    *
-   * @return {Array}
+   * @returns {Promise<Array<ModuleFile>>}
    */
-  async getPendingMigrations (storageKey) {
+  async getPendingMigrations (storageKey, _import = false) {
     const storage = this.getStorage(storageKey)
-    // Result array
-    const pendingMigrations = []
-
     // Get plugin names sorted by dependency order
     const dependenciesOrder = this.mid.pm.getSortedPlugins()
 
-    // Get plugin schema dirs, data dirs and executed version
-    const [schemaFiles, dataFiles, executedMigrations] = await Promise.all([
-      this._getSchematFiles(),
-      this._getDataFiles(),
+    // Get plugin schema dirs, data dirs and executed migrations
+    const [schemaModules, dataModules, executedMigrations] = await Promise.all([
+      this._importSchemaModules(_import),
+      this._importDataModules(_import),
       this._getExecutedMigrations(storage)
     ])
 
-    const dirs = {
-      schema: schemaFiles,
-      data: dataFiles
+    const migrationModules = {
+      schema: schemaModules,
+      data: dataModules
     }
+
+    return this._getPendingMigrations(migrationModules, executedMigrations, dependenciesOrder)
+  }
+
+  /**
+   * Return pending migrations from executed migrations
+   *
+   * @param {object}            migrationModules        Schema and data migrations modules
+   * @param {Array<ModuleFile>} migrationModules.schema Schema migrations module
+   * @param {Array<ModuleFile>} migrationModules.data   Data migrations module
+   * @param {Array<Migration>}  executedMigrations      Executed migration from storage
+   * @param {Array<string>}     dependenciesOrder       Plugin names sorted by dependencies order
+   *
+   * @returns {Array<ModuleFile>}
+   * @private
+   */
+  _getPendingMigrations (migrationModules, executedMigrations, dependenciesOrder) {
+    // Result array
+    const pendingMigrations = []
 
     // List plugins in dependencies order
     for (const plugin of dependenciesOrder) {
@@ -198,20 +236,24 @@ class MigrateService {
         data: []
       }
 
-      for (const type of Object.keys(dirs)) {
-        const files = dirs[type]
+      for (const type in migrationModules) {
+        const moduleFiles = migrationModules[type]
 
-        // List files
-        for (const file of files) {
+        // List module files
+        for (const file of moduleFiles) {
           // If file have save plugin add is not executed
           if (file.plugin === plugin && !this._isExecuted(file.relativePath, plugin, type, executedMigrations)) {
             file.type = type
             pending[type].push(file)
           }
         }
+
         // Sort
         pending[type].sort((a, b) => {
-          return this._compareVersion(a.relativePath, b.relativePath)
+          // Extract version number from file name
+          const versionA = a.relativePath.match(this._fileNameRegExp)[1]
+          const versionB = b.relativePath.match(this._fileNameRegExp)[1]
+          return this._compareVersion(versionA, versionB)
         })
       }
 
@@ -222,40 +264,42 @@ class MigrateService {
   }
 
   /**
-   * Return all schema files
+   * Return all schema module files
    *
-   * @return {Array}
+   * @param {boolean} import_ Flag to import or not modules
+   *
+   * @return {Array<ModuleFile>}
    * @private
    */
-  _getSchematFiles () {
-    return this.mid.pm.importDir(this.plugin.schemaDirKey, this._fileNameRegExp)
+  _importSchemaModules (_import) {
+    return this.mid.pm.importModules(this.plugin.schemaModuleTypeKey, _import)
   }
 
   /**
-   * Return all data files
+   * Return all data module files
    *
-   * @param {Array} dependenciesOrder Plugin names sorted by dependency order
+   * @param {boolean} import_ Flag to import or not modules
    *
-   * @return {Array}
+   * @return {Array<ModuleFile>}
    * @private
    */
-  _getDataFiles () {
-    return this.mid.pm.importDir(this.plugin.dataDirKey, this._fileNameRegExp)
+  _importDataModules (_import) {
+    return this.mid.pm.importModules(this.plugin.dataModuleTypeKey, _import)
   }
 
   /**
    * Execute num pending migrations
    *
    * @param {int}    num        Number of version to execute
-   * @param {String} storageKey Storage key
+   * @param {string} storageKey Storage key
    *
-   * @return {Array}
+   * @return {Promise<Array<ExecutedMigration>>}
    */
   async up (num = null, storageKey = null) {
     const storage = this.getStorage(storageKey)
     this.mid.info(`@midgar/migrate: up ${num || 'all'} ${storageKey || this.config.storage}`)
 
-    const pendingMigrations = await this.getPendingMigrations(storageKey)
+    const pendingMigrations = await this.getPendingMigrations(storageKey, true)
     if (!pendingMigrations.length) {
       this.mid.warn('@midgar/migrate: No pending migration in storage.')
       return []
@@ -266,15 +310,15 @@ class MigrateService {
     if (num && typeof num === 'string') num = parseInt(num)
     // If no number version is specified exec all pending
     if (num === null) num = pendingMigrations.length
-    if (num && (typeof num !== 'number' || num > pendingMigrations.length)) throw new Error('@midgar/migrate: Invalid num paramèter: ' + num + ' !')
+    if (num && (typeof num !== 'number' || num > pendingMigrations.length)) throw new Error(`@midgar/migrate: Invalid num paramèter: ${num} !`)
     // List migrations sync to exec in order
     for (let i = 0; i < num; i++) {
-      const version = pendingMigrations[i]
-      const plugin = version.plugin
-      const type = version.type
+      const migration = pendingMigrations[i]
+      const plugin = migration.plugin
+      const type = migration.type
       // List vesion files
-      const execTime = await this._execMigration(storage, 'up', version, type)
-      result.push({ plugin, type, name: version.relativePath, path: version.path, time: execTime })
+      const execTime = await this._execMigration(storage, 'up', migration, type)
+      result.push({ plugin, type, name: migration.relativePath, path: migration.path, time: execTime })
     }
 
     return result
@@ -283,13 +327,13 @@ class MigrateService {
   /**
    * Downgrade num executed migrations
    *
-   * @return {Array}
+   * @return {Promise<Array<ExecutedMigration>>}}
    */
   async down (num = null, storageKey = null) {
     const storage = this.getStorage(storageKey)
     this.mid.info(`@midgar/migrate: down ${num || 'all'} ${storageKey || this.config.storage}`)
     // Get files and executed migrations async
-    const [schemaFiles, dataFiles, executedMigrations] = await Promise.all([this._getSchematFiles(), this._getDataFiles(), this._getExecutedMigrations(storage)])
+    const [schemaFiles, dataFiles, executedMigrations] = await Promise.all([this._importSchemaModules(), this._importDataModules(), this._getExecutedMigrations(storage)])
 
     if (!executedMigrations.length) {
       this.mid.warn('@midgar/migrate: No executed migration in storage.')
@@ -308,108 +352,88 @@ class MigrateService {
       const plugin = executedMigration.plugin
       const type = executedMigration.type
 
-      // Get version to execute
+      // Get migrations file to execute
       const files = executedMigration.type === 'schema' ? schemaFiles : dataFiles
-      const version = this._getMigration(executedMigration, files, type)
+      const migrationFile = this._getMigrationModuleFile(executedMigration, files, type)
 
       // List vesion files
-      const execTime = await this._execMigration(storage, 'down', version, type)
-      result.push({ plugin, type, name: version.relativePath, path: version.path, time: execTime })
+      const execTime = await this._execMigration(storage, 'down', migrationFile, type)
+      result.push({ plugin, type, name: migrationFile.relativePath, path: migrationFile.path, time: execTime })
     }
 
     return result
   }
 
   /**
-   * Return version file corresponding to excecuted version Oject
+   * Return migration module file corresponding to migration Object
    *
-   * @param {Object} executedMigration {
-   *                                   {Sting} plugin Plugin name
-   *                                   {Sting} name   Migration name (relative file path)
-   *                                   {Sting} type   Migration type (schema|data)
-   *                                 }
-   * @param {Array}  files           Array of Object file
-   * @param {String} type            Migration type (schema|data)
+   * @param {Migration}         migration      Migration object
+   * @param {Array<ModuleFile>} migrationFiles Array of migration module files
+   * @param {string}            type           Migration type (schema|data)
    *
-   * @return {Object}
+   * @return {ModuleFile}
    * @return @private
    */
-  _getMigration (executedMigration, files, type) {
-    for (const file of files) {
-      if (file.plugin === executedMigration.plugin && file.relativePath === executedMigration.name &&
-        type === executedMigration.type) {
+  _getMigrationModuleFile (migration, migrationFiles, type) {
+    for (const file of migrationFiles) {
+      if (file.plugin === migration.plugin && file.relativePath === migration.name &&
+        type === migration.type) {
         return file
       }
     }
 
-    throw new Error('@midgar/migrate: Invalid version: ' + JSON.stringify(executedMigration) + ' !')
+    throw new Error('@midgar/migrate: Migration : ' + JSON.stringify(migration) + ' !')
   }
 
   /**
-   * Check a version file anf throw error if it not valid
+   * Check a migration module file
    *
-   * @param {Object} file File object {
-   *                                    {String} path         Absolute file path
-   *                                    {String} plugin       Plugin name
-   *                                    {Sting}  relativePath Relative file path
-   *                                    {Object} export {
-   *                                      {function || Array} up upgrade function
-   *                                      {function || Array} down downgrade function
-   *                                    }
-   *                                  }
+   * @param {ModuleFile} migrationFile Module file object
    * @private
    */
-  _checkMigrationFile (file) {
-    if (!file.export.up) {
-      throw new Error('@midgar/migrate: Not up function in the version file : ' + file.path + ' !')
+  _checkMigrationModuleFile (migrationFile) {
+    if (!migrationFile.export.up) {
+      throw new Error(`@midgar/migrate: Not up function in the migration module: ${migrationFile.path} !`)
     }
 
     // Check type
-    if (file.export.down && ((typeof file.export.up === 'function' && typeof file.export.down !== 'function') ||
-      (Array.isArray(file.export.up) && file.export.down && !Array.isArray(file.export.down)))) {
-      throw new TypeError('@midgar/migrate: : not same type for the up and down key in the version file : ' + file.path)
+    if (migrationFile.export.down && ((typeof migrationFile.export.up === 'function' && typeof migrationFile.export.down !== 'function') ||
+      (Array.isArray(migrationFile.export.up) && migrationFile.export.down && !Array.isArray(migrationFile.export.down)))) {
+      throw new TypeError(`@midgar/migrate: : not same type for the up and down key in the migration module: ${migrationFile.path}.`)
     }
 
     // Check num items in the array
-    if (Array.isArray(file.export.up) && file.export.down && file.export.up.length !== file.export.down.length) {
-      throw new Error('@midgar/migrate: not same length for the up and down array in the version file : ' + file.path)
+    if (Array.isArray(migrationFile.export.up) && migrationFile.export.down && migrationFile.export.up.length !== migrationFile.export.down.length) {
+      throw new Error(`@midgar/migrate: not same length for the up and down array in the migration module: ${migrationFile.path}.`)
     }
   }
 
   /**
-   * Exec a version file, save state in storage and return exec time
+   * Exec a migration module, save state in storage and return exec time
    *
-   * @param {MigrateStorage} storage Storage instance
-   * @param {String} method   Execution method (up | down)
-   * @param {Object} file File object {
-   *                                    {String} path         Absolute file path
-   *                                    {String} plugin       Plugin name
-   *                                    {Sting}  relativePath Relative file path
-   *                                    {Object} export {
-   *                                      {function || Array} up upgrade function
-   *                                      {function || Array} down downgrade function
-   *                                    }
-   *                                  }
-   * @param {String} type     Type of version (schema | data)
-   * @param {String} plugin   Plugin name
+   * @param {MigrateStorage} storage       Storage instance
+   * @param {string}         method        Execution method (up | down)
+   * @param {ModuleFile}     migrationFile Migration module file
+   * @param {string}         type          Type of migration (schema | data)
+   * @param {string}         plugin        Plugin name
    *
-   * @return {Number}
+   * @return {Promise<number>}
    * @private
    */
-  async _execMigration (storage, method, file, type) {
-    this._checkMigrationFile(file)
-    this.mid.debug('@midgar/migrate: Execute ' + method + ' on ' + file.path)
-    const execTime = await this._execMigrationFunc(storage, method, file.export, !this.config.rollBack === false)
+  async _execMigration (storage, method, migrationFile, type) {
+    this._checkMigrationModuleFile(migrationFile)
+    this.mid.debug(`@midgar/migrate: Execute ${method} on ${migrationFile.path}.`)
+    const execTime = await this._execMigrationFunc(storage, method, migrationFile.export, !this.config.rollBack === false)
     // Save in storage
     try {
-      // if down delete version or save if it up
+      // if down delete migration or save if it up
       if (method === 'down') {
-        await storage.deleteMigration(file.plugin, file.relativePath, type)
+        await storage.deleteMigration(migrationFile.plugin, migrationFile.relativePath, type)
       } else {
-        await storage.saveMigration(file.plugin, file.relativePath, type)
+        await storage.saveMigration(migrationFile.plugin, migrationFile.relativePath, type)
       }
     } catch (error) {
-      this.mid.error('@midgar/migrate: save version error !')
+      this.mid.error('@midgar/migrate: save migration error !')
       this.mid.error(error)
     }
 
@@ -417,44 +441,35 @@ class MigrateService {
   }
 
   /**
-   * Execute a version file
+   * Execute a migration module
    *
-   * @param {MigrateStorage} storage  Storage instance
-   * @param {String}         method   method to execute (up || down)
-   * @param {Object}         version  version object {
-   *                                         {function || Array} up upgrade function
-   *                                         {function || Array} down downgrade function
-   *                                         }
-   * @param {String}         filePath file path for log
-   * @param {Boolean}        rollback rollback or not if have an error
+   * @param {MigrateStorage}  storage   Storage instance
+   * @param {string}          method    Method to execute (up || down)
+   * @param {MigrationModule} migration Migration Module
+   * @param {boolean}         rollback  Rollback or not if have an error
    *
-   * @return {Promise<Object>}
+   * @return {Promise<number>}
    * @private
    */
-  async _execMigrationFunc (storage, method, version, rollback = false) {
+  async _execMigrationFunc (storage, method, migration, rollback = false) {
     /**
      * beforeExec event.
      * @event @midgar/migrate:beforeExec
      */
-    await this.mid.emit('@midgar/migrate:beforeExec', this, method, version)
+    await this.mid.emit('@midgar/migrate:beforeExec', this, method, migration)
 
-    if (typeof version.up === 'function') {
+    if (typeof migration.up === 'function') {
       try {
-        // Get exec start time
-        const hrStart = process.hrtime()
-        await version[method].apply(this, [this.mid, ...storage.getCallArgs()])
-
-        const hrEnd = process.hrtime(hrStart)
-
-        // Return exec time in ms
-        const result = (hrEnd[0] * 1000) + (hrEnd[1] / 1000000)
+        timer.start('midgar-migrate-exec')
+        await migration[method].apply(this, [this.mid, ...storage.getCallArgs()])
+        const execTime = timer.getTime('midgar-migrate-exec')
         /**
          * afterExec event.
          * @event @midgar/migrate:afterExec
          */
-        await this.mid.emit('@midgar/migrate:afterExec', this, method, version, result)
+        await this.mid.emit('@midgar/migrate:afterExec', this, method, migration, execTime)
 
-        return result
+        return execTime
       } catch (error) {
         this.mid.error('@midgar/migrate: Something bad has happened !')
         this.mid.error(error)
@@ -466,7 +481,7 @@ class MigrateService {
         this.mid.warn('@midgar/migrate: Rollback !!!')
         // Roll back
         try {
-          return this._execMigration(storage, method === 'up' ? 'down' : 'up', version)
+          return this._execMigration(storage, method === 'up' ? 'down' : 'up', migration)
         } catch (rollBackError) {
           this.mid.error(rollBackError)
           throw new Error('@midgar/migrate: Execution fail !')

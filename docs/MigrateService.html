@@ -47,7 +47,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#%257D">}</a></li>
+					<li><a href="global.html#serviceName">serviceName</a></li><li><a href="global.html#%257D">}</a></li>
 				</ul>
 			</li>
 			
@@ -88,7 +88,7 @@
         MigrateService
         </h2>
         
-            <div class="class-description">Midgar migrate service</div>
+            <div class="class-description">MidgarService class</div>
         
     
 </header>
@@ -244,7 +244,7 @@
             
 <hr>
 <dt class="name" id="config">
-    <h4 id="config"><span class="type-signature"></span>config<span class="type-signature"> :Object</span></h4>
+    <h4 id="config"><span class="type-signature"></span>config<span class="type-signature"> :object</span></h4>
 
     
 </dt>
@@ -260,7 +260,7 @@
         <ul>
             <li>
                 
-<span class="param-type">Object</span>
+<span class="param-type">object</span>
 
 
 
@@ -386,7 +386,7 @@
             
 <hr>
 <dt class="name" id="storages">
-    <h4 id="storages"><span class="type-signature"></span>storages<span class="type-signature"> :Object</span></h4>
+    <h4 id="storages"><span class="type-signature"></span>storages<span class="type-signature"> :object</span></h4>
 
     
 </dt>
@@ -402,7 +402,7 @@
         <ul>
             <li>
                 
-<span class="param-type">Object</span>
+<span class="param-type">object</span>
 
 
 
@@ -463,7 +463,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="_getMigration"><span class="type-signature"></span>_getMigration(executedMigration, files, type)</h4>
+    <h4 class="name" id="_getMigrationModuleFile"><span class="type-signature"></span>_getMigrationModuleFile(migration, migrationFiles, type)</h4>
     
     
 </dt>
@@ -471,7 +471,7 @@
 
     
     <div class="description">
-        Return version file corresponding to excecuted version Oject
+        Return migration module file corresponding to migration Object
     </div>
     
 
@@ -506,13 +506,13 @@
 
         <tr>
             
-                <td class="name"><code>executedMigration</code></td>
+                <td class="name"><code>migration</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type"><a href="global.html#Migration">Migration</a></span>
 
 
 
@@ -523,24 +523,20 @@
 
             
 
-            <td class="description last">{
-                                  {Sting} plugin Plugin name
-                                  {Sting} name   Migration name (relative file path)
-                                  {Sting} type   Migration type (schema|data)
-                                }</td>
+            <td class="description last">Migration object</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>files</code></td>
+                <td class="name"><code>migrationFiles</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array</span>
+<span class="param-type">Array.&lt;ModuleFile></span>
 
 
 
@@ -551,7 +547,7 @@
 
             
 
-            <td class="description last">Array of Object file</td>
+            <td class="description last">Array of migration module files</td>
         </tr>
 
     
@@ -564,7 +560,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -646,7 +642,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">ModuleFile</span>
 
 
 
@@ -672,7 +668,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="_isExecuted"><span class="type-signature"></span>_isExecuted(versionName, plugin, type, executedMigrations)</h4>
+    <h4 class="name" id="_isExecuted"><span class="type-signature"></span>_isExecuted(name, plugin, type, executedMigrations)</h4>
     
     
 </dt>
@@ -680,7 +676,7 @@
 
     
     <div class="description">
-        Return true if the version file is already executed or false
+        Return true if the migration already executed or false
     </div>
     
 
@@ -715,13 +711,13 @@
 
         <tr>
             
-                <td class="name"><code>versionName</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -745,7 +741,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -769,7 +765,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -793,7 +789,7 @@
             <td class="type">
             
                 
-<span class="param-type">Array</span>
+<span class="param-type">Array.&lt;<a href="global.html#Migration">Migration</a>></span>
 
 
 
@@ -804,7 +800,7 @@
 
             
 
-            <td class="description last">Executed version files</td>
+            <td class="description last">Executed migrations</td>
         </tr>
 
     
@@ -875,7 +871,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Boolean</span>
+<span class="param-type">boolean</span>
 
 
 
@@ -950,7 +946,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -1126,6 +1122,10 @@
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    }
+</div>
+
 
 
 <dl>
@@ -1134,7 +1134,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Array</span>
+<span class="param-type">Promise.&lt;Array.&lt;<a href="global.html#ExecutedMigration">ExecutedMigration</a>>></span>
 
 
 
@@ -1151,7 +1151,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getPendingMigrations"><span class="type-signature">&lt;async> </span>getPendingMigrations(storageKey)</h4>
+    <h4 class="name" id="getPendingMigrations"><span class="type-signature">&lt;async> </span>getPendingMigrations(storageKey, import_)</h4>
     
     
 </dt>
@@ -1200,7 +1200,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -1212,6 +1212,30 @@
             
 
             <td class="description last">Storage key</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>import_</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Flag to import or not modules</td>
         </tr>
 
     
@@ -1282,7 +1306,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Array</span>
+<span class="param-type">Promise.&lt;Array.&lt;ModuleFile>></span>
 
 
 
@@ -1350,7 +1374,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -1526,6 +1550,26 @@ Let other plugin add storage
     
 
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;void></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -1615,7 +1659,7 @@ Let other plugin add storage
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 
@@ -1703,7 +1747,7 @@ Let other plugin add storage
     </dt>
     <dd>
         
-<span class="param-type">Array</span>
+<span class="param-type">Promise.&lt;Array.&lt;<a href="global.html#ExecutedMigration">ExecutedMigration</a>>></span>
 
 
 
@@ -1766,7 +1810,7 @@ Let other plugin add storage
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on 2020-01-02T15:50:13+00:00
+		on 2020-01-20T00:17:48+00:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

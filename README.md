@@ -1,5 +1,5 @@
 [![Build Status](https://drone.midgar.io/api/badges/Midgar/migrate/status.svg)](https://drone.midgar.io/Midgar/migrate)
-[![Coverage](https://sonar.midgar.io/api/project_badges/measure?project=Midgar%3Amigrate&metric=coverage)](https://sonar.midgar.io/dashboard?id=Midgar%3Amigrate)
+[![Coverage](https://sonar.midgar.io/api/project_badges/measure?project=midgar-migrate&metric=coverage)](https://sonar.midgar.io/dashboard?id=midgar-migrate)
 
 
 ## @midgar/migrate
@@ -9,23 +9,24 @@ Système de migration pour [Midgar](https://github.com/midgarjs/midgar)
 ## Installation
 
 ```sh
-$ npm i @midgar/migrate --save
+$ npm i @midgar/migrate
 ```
 Si tout s'est bien passé, un message de confirmation s'affiche:
 
 ```sh
 #midgar-cli
-@midgar/migrate added to plugins.js !
+@midgar/migrate added to plugins.json !
 ```
 
 ## Fonctionnement
-Ajoute un dossier de plugin **midgar-migrate-schemas**: ./migrations/schemas et **midgar-migrate-data**: ./migrations/data'
+Ajoute les types de modules **midgar-migrate-schema** dans le dossier ./migrations/schemas et **midgar-migrate-data**,./migrations/data.
 
-Ce plugin à besoin d'un storage pour fonctionner. Le storage sert a sauvegarder l'état des migrations.
+Les migration **data** sont exéctuté apres les **schema**.
+Ce plugin à besoin d'un storage pour fonctionner. Le storage sert a sauvegarder de facon permanante l'état des migrations.
 
-## Fichier migration
+## module migration
 
-Exemple de fichier de migration:
+Exemple de module de migration:
 ```js
 export default {
   up: async (mid, ...storageArgs) => {
@@ -84,15 +85,29 @@ $ midgar migrate:up --storage mongo
 
 Exemple de storage:
 ```js
+/**
+ * @typedef {Object} Migration
+ * @property {string} plugin Plugin name
+ * @property {string} name   Migration file name
+ * @property {string} type   Migration type (schema|data)
+ */
+
+
 class Storage {
   constructor (mid) {
     this.mid = mid
   }
 
+  /**
+   * @return {<Promis<boolean>>}
+   */
   async isInstalled () {
     return true
   }
 
+  /**
+   * @return {<Promis<Array<Mirgration>>>}
+   */
   async getMigrations () {
     return []
   }
@@ -103,9 +118,10 @@ class Storage {
    * @param {string} plugin Plugin name
    * @param {string} name   Migration file name
    * @param {string} type   Migration type (schema|data)
+   *
+   * @return {Promise<void>}
    */
-  async saveMigration (plugin, name, type) {
-  }
+  async saveMigration (plugin, name, type) {}
 
   /**
    * Delete executed migration
@@ -113,12 +129,15 @@ class Storage {
    * @param {string} plugin Plugin name
    * @param {string} name   Migration file name
    * @param {string} type   Migration type (schema|data)
+   * 
+   * @return {Promise<void>}
    */
-  async deleteMigration (plugin, name, type) {
-  }
+  async deleteMigration (plugin, name, type) {}
 
   /**
    * Retrun migation function args after midgar instance 
+   * 
+   * @return {Array<any>}
    */
   getCallArgs () {
     return []
@@ -139,3 +158,5 @@ this.mid.on('@midgar/migrate:init', (migrateService) => {
   migrateService.addStorage('monstorage', Storage)
 })
 ```
+
+[documentation Api](https://midgarjs.github.io/migrate/).

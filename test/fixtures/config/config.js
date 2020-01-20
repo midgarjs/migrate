@@ -22,7 +22,5 @@ export default {
     stdout: false,
     level: 'error'
   },
-  pm: {
-    localPath: resolve('../plugins')
-  }
+  pluginsLocalPath: resolve('../plugins')
 }

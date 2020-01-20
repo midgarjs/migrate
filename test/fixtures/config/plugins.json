@@ -1,0 +1,10 @@
+{
+  "@midgar/migrate": {
+    "enabled": true,
+    "path": "../../.."
+  }, 
+  "@midgar/service": true,
+  "test-plugin": { "local": true },
+  "test-plugin-2": { "local": true },
+  "test-plugin-3": { "local": true }
+}
