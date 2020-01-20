@@ -1,7 +1,6 @@
 
 import semver from 'semver'
-import { assignRecursive } from '@midgar/utils'
-import { timer } from '@midgar/utils'
+import { assignRecursive, timer } from '@midgar/utils'
 
 /**
  * @typedef {Object} Migration
