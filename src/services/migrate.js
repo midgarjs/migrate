@@ -96,8 +96,8 @@ class MigrateService {
   /**
    * Add storage
    *
-   * @param {string}           key     Storage key
-   * @param {MigrateStorage} storage Storage instance
+   * @param {string}         key     Storage key
+   * @param {MigrateStorage} storage Storage constuctor
    */
   addStorage (key, storage) {
     this.storages[key] = storage
@@ -118,7 +118,7 @@ class MigrateService {
     if (!key) key = this.config.storage
 
     // Check if storage exist
-    if (!this.storages[key]) throw new Error('@midgar/migrate: Invalid storage key: ' + key + ' !')
+    if (!this.storages[key]) throw new Error(`@midgar/migrate: Invalid storage key: ${key} !`)
 
     // Check if instance exist
     if (!this._storageInstances[key]) this._storageInstances[key] = new (this.storages[key])(this.mid)
